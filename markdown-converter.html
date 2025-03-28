@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>LaTeX to Markdown Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a56d4;
+            --bg-color: #f8fafc;
+            --card-color: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --sidebar-width: 250px;
+        }
+
+        .dark-mode {
+            --primary-color: #60a5fa;
+            --primary-hover: #3b82f6;
+            --bg-color: #1e293b;
+            --card-color: #334155;
+            --text-color: #f8fafc;
+            --border-color: #475569;
+            --success-color: #34d399;
+            --warning-color: #fbbf24;
+            --error-color: #f87171;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin: 25px 0;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+        
+        .main-layout {
+            display: flex;
+            gap: 20px;
+        }
+
+        .input-output-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .preview-column {
+            flex: 1;
+        }
+
+        .converter-card {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            height: 100%;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .input-section, .output-section {
+            min-width: initial;
+            padding: 20px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .section-title svg {
+            margin-right: 8px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 250px;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: border 0.2s, box-shadow 0.2s, background-color 0.3s, color 0.3s;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+        
+        #markdown-output {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        #compiled-output {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 545px;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            background-color: var(--card-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            font-size: 15px;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        /* Toolbar styles */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+
+        .btn-error {
+            background-color: var(--error-color);
+        }
+
+        .btn-error:hover {
+            background-color: #dc2626;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .toggle-label {
+            margin-left: 10px;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        /* Linter styles */
+        .lint-issues {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid var(--error-color);
+        }
+
+        .lint-issue {
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: var(--error-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .lint-issue.warning {
+            color: var(--warning-color);
+        }
+
+        /* MathJax specific styles */
+        .math-display {
+            display: block;
+            margin: 1em 0;
+            text-align: center;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        
+        /* Center block formulas */
+        mjx-container[jax="CHTML"][display="true"] {
+            display: block !important;
+            text-align: center !important;
+            margin: 1em auto !important;
+            padding: 0.5em 0 !important;
+            overflow-x: auto !important;
+        }
+        
+        /* Ensure proper alignment for inline math */
+        mjx-container {
+            display: inline-block !important;
+            vertical-align: middle !important;
+        }
+        
+        /* Scrollable container for wide formulas */
+        .math-scroll {
+            overflow-x: auto;
+            max-width: 100%;
+            padding: 5px 0;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+            background-color: #e2e8f0;
+            color: #64748b;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .status-indicator.active {
+            background-color: #d1fae5;
+            color: var(--success-color);
+        }
+        
+        .status-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+            background-color: currentColor;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 992px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .preview-column {
+                 margin-top: 20px;
+            }
+            #compiled-output {
+                 min-height: 200px;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .toast.error {
+            background-color: var(--error-color);
+        }
+
+        .toast.warning {
+            background-color: var(--warning-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LaTeX to Markdown Converter</h1>
+        
+        <div class="main-layout">
+            <div class="input-output-column">
+                <div class="converter-card">
+                    <div class="input-section">
+                        <div class="toolbar">
+                            <div class="toolbar-group">
+                                <button class="btn" onclick="addLatexExample()">
+                                    <i class="fas fa-lightbulb"></i> Load Example
+                                </button>
+                                <button class="btn btn-secondary" onclick="clearInput()">
+                                    <i class="fas fa-trash-alt"></i> Clear
+                                </button>
+                            </div>
+                            <div class="toolbar-group">
+                                <button class="btn btn-secondary" onclick="lintLatex()">
+                                    <i class="fas fa-check-circle"></i> Lint
+                                </button>
+                            </div>
+                            <div class="toolbar-group">
+                                <label class="switch">
+                                    <input type="checkbox" id="auto-convert-toggle" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="toggle-label">Auto Convert</span>
+                            </div>
+                            <div class="toolbar-group">
+                                <label class="switch">
+                                    <input type="checkbox" id="auto-copy-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="toggle-label">Auto Copy</span>
+                            </div>
+                            <div class="toolbar-group">
+                                <button class="btn btn-secondary" onclick="toggleTheme()">
+                                    <i class="fas fa-moon"></i> Theme
+                                </button>
+                            </div>
+                        </div>
+                        <div class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                            LaTeX Input
+                        </div>
+                        <textarea id="latex-input" placeholder="Enter your LaTeX here..."></textarea>
+                        <div id="lint-results"></div>
+                    </div>
+                </div>
+
+                <div class="converter-card">
+                    <div class="output-section">
+                        <div class="toolbar">
+                            <div class="toolbar-group">
+                                <button class="btn btn-success" onclick="copyToClipboard()">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                                <button class="btn btn-success" onclick="downloadMarkdown()">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <div class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            Markdown Result
+                            <div id="status-indicator" class="status-indicator">
+                                <span></span> Ready
+                            </div>
+                        </div>
+                        <textarea id="markdown-output" placeholder="Markdown result will appear here..." readonly></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-column">
+                 <div class="section-title" style="padding-left: 5px; margin-bottom: 10px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="4 17 10 11 4 5"></polyline>
+                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                    </svg>
+                    Preview
+                </div>
+                <div id="compiled-output">Markdown preview will appear here...</div>
+            </div>
+        </div>
+        
+        <footer>
+            LaTeX to Markdown Converter &copy; 2023 | Automatic conversion on input
+        </footer>
+    </div>
+
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Copied to clipboard!</span>
+    </div>
+    
+    <!-- Подключение необходимых библиотек -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script>
+    // Настройка MathJax v3
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true,
+            processEnvironments: true,
+            tags: 'ams'
+        },
+        options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+            renderActions: {
+                findBr: [10, function (doc) {
+                    for (const node of document.querySelectorAll('br')) {
+                        node.className += ' MathJax_ignore';
+                    }
+                }, function () {}]
+            }
+        },
+        chtml: {
+            scale: 1.1,
+            displayAlign: 'center',
+            displayIndent: '0'
+        },
+        startup: {
+            ready: () => {
+                MathJax.startup.defaultReady();
+                MathJax.startup.promise.then(() => {
+                    MathJax.typesetPromise().catch(err => console.log('Typeset failed: ' + err.message));
+                });
+            }
+        }
+    };
+
+    // Элементы DOM
+    const latexInput = document.getElementById('latex-input');
+    const markdownOutput = document.getElementById('markdown-output');
+    const compiledOutput = document.getElementById('compiled-output');
+    const statusIndicator = document.getElementById('status-indicator');
+    const autoConvertToggle = document.getElementById('auto-convert-toggle');
+    const autoCopyToggle = document.getElementById('auto-copy-toggle');
+    const lintResults = document.getElementById('lint-results');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+
+    // Состояние приложения
+    let isConverting = false;
+    let isDarkMode = false;
+
+    // Функция для показа уведомления
+    function showToast(message, type = 'success') {
+        toastMessage.textContent = message;
+        toast.className = 'toast';
+        toast.classList.add(type);
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    // Функция для переключения темы
+    function toggleTheme() {
+        isDarkMode = !isDarkMode;
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode);
+        
+        // Обновляем иконку
+        const themeBtn = document.querySelector('.btn-secondary i.fa-moon');
+        if (themeBtn) {
+            themeBtn.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        
+        showToast(`Switched to ${isDarkMode ? 'dark' : 'light'} mode`);
+    }
+
+    // Проверяем сохраненную тему
+    if (localStorage.getItem('darkMode') === 'true') {
+        toggleTheme(); // Применяем темную тему если она была сохранена
+    }
+
+    // Функция для добавления примера LaTeX
+    function addLatexExample() {
+        latexInput.value = `# Example LaTeX Formulas in Markdown
+
+## Linear Algebra
+System solution:
+$Ax = b$
+
+## Integral Calculus
+Integration by parts:
+$$
+\\int u(x) \\frac{dv(x)}{dx} dx = u(x)v(x) - \\int v(x) \\frac{du(x)}{dx} dx
+$$
+
+## Trigonometry
+Trigonometric identity:
+$\\sin^2(x) + \\cos^2(x) = 1$
+
+## Matrix
+$$
+\\begin{bmatrix} 
+a & b & c \\\\
+d & e & f \\\\
+g & h & i 
+\\end{bmatrix}
+$$
+
+## Euler's Identity
+$$
+e^{i\\pi} + 1 = 0
+$$
+
+## Limits
+$$
+\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1
+$$
+
+## Long Formula
+$$
+\\frac{1}{\\Delta x} \\int_{x}^{x+\\Delta x} f(t) dt = 
+f(x) + \\frac{f'(x)}{2}\\Delta x + \\frac{f''(x)}{6}(\\Delta x)^2 + \\frac{f'''(x)}{24}(\\Delta x)^3 + \\cdots
+$$`;
+
+        if (autoConvertToggle.checked) {
+            convertToMarkdown();
+        }
+        showToast('Example loaded');
+    }
+
+    // Функция для очистки ввода
+    function clearInput() {
+        latexInput.value = '';
+        markdownOutput.value = '';
+        compiledOutput.textContent = 'Markdown preview will appear here...';
+        lintResults.innerHTML = '';
+        showToast('Input cleared');
+    }
+
+    // Функция для копирования в буфер обмена
+    function copyToClipboard() {
+        if (!markdownOutput.value) {
+            showToast('Nothing to copy', 'error');
+            return;
+        }
+        
+        navigator.clipboard.writeText(markdownOutput.value)
+            .then(() => showToast('Copied to clipboard!'))
+            .catch(err => {
+                console.error('Failed to copy: ', err);
+                showToast('Failed to copy', 'error');
+            });
+    }
+
+    // Функция для скачивания Markdown файла
+    function downloadMarkdown() {
+        if (!markdownOutput.value) {
+            showToast('Nothing to download', 'error');
+            return;
+        }
+        
+        const blob = new Blob([markdownOutput.value], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'converted.md';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Download started');
+    }
+
+    // Простая функция для проверки LaTeX
+    function lintLatex() {
+        const text = latexInput.value;
+        const issues = [];
+        
+        // Проверка на незакрытые математические выражения
+        const mathBlocks = text.match(/(\$\$|\$\|\\[\(\[])/g);
+        if (mathBlocks) {
+            const openCount = mathBlocks.filter(m => m === '$$' || m === '\\[' || m === '\\(').length;
+            const closeCount = mathBlocks.filter(m => m === '$$' || m === '\\]' || m === '\\)').length;
+            
+            if (openCount !== closeCount) {
+                issues.push({
+                    message: `Unbalanced math delimiters (${openCount} opening vs ${closeCount} closing)`,
+                    severity: 'error'
+                });
+            }
+        }
+        
+        // Проверка на потенциальные ошибки
+        if (text.includes('\\frac{}')) {
+            issues.push({
+                message: 'Empty fraction detected',
+                severity: 'warning'
+            });
+        }
+        
+        if (text.includes('\\begin{') && !text.includes('\\end{')) {
+            issues.push({
+                message: 'Unclosed environment detected',
+                severity: 'error'
+            });
+        }
+        
+        // Отображение результатов
+        if (issues.length === 0) {
+            lintResults.innerHTML = '<div class="lint-issues" style="border-color: var(--success-color)">' +
+                '<div class="lint-issue"><i class="fas fa-check-circle"></i> No issues found</div>' +
+                '</div>';
+        } else {
+            let html = '<div class="lint-issues">';
+            issues.forEach(issue => {
+                const icon = issue.severity === 'error' ? 'fa-exclamation-circle' : 'fa-exclamation-triangle';
+                html += `<div class="lint-issue ${issue.severity}"><i class="fas ${icon}"></i> ${issue.message}</div>`;
+            });
+            html += '</div>';
+            lintResults.innerHTML = html;
+        }
+        
+        showToast(`Found ${issues.length} issues`, issues.length ? 'warning' : 'success');
+    }
+
+    // Основная функция конвертации
+    function convertToMarkdown() {
+        if (isConverting || !autoConvertToggle.checked) return;
+        
+        isConverting = true;
+        statusIndicator.textContent = "Converting...";
+        statusIndicator.classList.remove("active");
+        
+        setTimeout(() => {
+            try {
+                let latexText = latexInput.value;
+                let markdownText = latexText;
+    
+                // Обработка математических выражений
+                markdownText = markdownText.replace(/\\\[([\s\S]*?)\\\]/gs, '$$\n$1\n$$');
+                markdownText = markdownText.replace(/\\\(([\s\S]*?)\\\)/gs, '$$1$');
+                markdownText = markdownText.replace(/\$\$([\s\S]*?)\$\$/gs, '$$\n$1\n$$');
+                markdownText = markdownText.replace(/\$([\s\S]*?)\$/g, '$$1$');
+    
+                // Устанавливаем результат
+                markdownOutput.value = markdownText;
+                
+                // Отображение предпросмотра
+                compiledOutput.innerHTML = marked.parse(markdownText);
+                
+                // Перерендеринг математических выражений
+                if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                    MathJax.typesetPromise([compiledOutput]).catch(err => {
+                        console.error('MathJax error:', err);
+                    });
+                }
+                
+                statusIndicator.textContent = "Ready";
+                statusIndicator.classList.add("active");
+                
+                // Автоматическое копирование если включено
+                if (autoCopyToggle.checked && markdownText.trim()) {
+                    copyToClipboard();
+                }
+            } catch (error) {
+                statusIndicator.textContent = "Error";
+                console.error("Conversion error:", error);
+            } finally {
+                isConverting = false;
+            }
+        }, 100);
+    }
+    
+    // Автоматическая конвертация при вводе с задержкой
+    let typingTimer;
+    const doneTypingInterval = 500;
+    
+    latexInput.addEventListener('input', () => {
+        clearTimeout(typingTimer);
+        statusIndicator.textContent = "Typing...";
+        statusIndicator.classList.remove("active");
+        
+        typingTimer = setTimeout(() => {
+            convertToMarkdown();
+            if (autoConvertToggle.checked) {
+                lintLatex();
+            }
+        }, doneTypingInterval);
+    });
+
+    // Инициализация при загрузке
+    document.addEventListener('DOMContentLoaded', () => {
+        markdownOutput.value = "";
+        compiledOutput.textContent = "Markdown preview will appear here...";
+        
+        // Загружаем пример если поле пустое
+        if (!latexInput.value.trim()) {
+            addLatexExample();
+        }
+    });
+    </script>
+</body>
+</html>
