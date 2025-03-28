@@ -131,7 +131,7 @@
         #compiled-output {
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 15px;
+            padding: 25px 40px;
             min-height: 545px;
             max-height: 600px;
             overflow-y: auto;
@@ -139,7 +139,52 @@
             background-color: var(--card-color);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             font-size: 15px;
+            line-height: 1.6;
             transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        #compiled-output h1, 
+        #compiled-output h2, 
+        #compiled-output h3, 
+        #compiled-output h4, 
+        #compiled-output h5, 
+        #compiled-output h6 {
+            margin-top: 1.5em;
+            margin-bottom: 0.75em;
+            color: var(--primary-color);
+        }
+
+        #compiled-output h1 {
+            font-size: 1.8em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.3em;
+        }
+
+        #compiled-output h2 {
+            font-size: 1.5em;
+            margin-top: 1.3em;
+        }
+
+        #compiled-output p {
+            margin: 0.8em 0;
+        }
+
+        /* Improve MathJax specific styles */
+        #compiled-output .math-display {
+            display: block;
+            margin: 1.5em 0;
+            text-align: center;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        /* Center block formulas with more space */
+        #compiled-output mjx-container[jax="CHTML"][display="true"] {
+            display: block !important;
+            text-align: center !important;
+            margin: 1.2em auto !important;
+            padding: 0.7em 0 !important;
+            overflow-x: auto !important;
         }
 
         /* Toolbar styles */
@@ -257,30 +302,6 @@
             font-size: 14px;
             color: var(--text-color);
         }
-
-        /* MathJax specific styles */
-        .math-display {
-            display: block;
-            margin: 1em 0;
-            text-align: center;
-            overflow-x: auto;
-            padding: 10px 0;
-        }
-        
-        /* Center block formulas */
-        mjx-container[jax="CHTML"][display="true"] {
-            display: block !important;
-            text-align: center !important;
-            margin: 1em auto !important;
-            padding: 0.5em 0 !important;
-            overflow-x: auto !important;
-        }
-        
-        /* Ensure proper alignment for inline math */
-        mjx-container {
-            display: inline-block !important;
-            vertical-align: middle !important;
-        }
         
         /* Scrollable container for wide formulas */
         .math-scroll {
@@ -373,6 +394,90 @@
             display: flex;
             justify-content: flex-end;
             margin-bottom: 20px;
+        }
+
+        /* MathJax specific styles */
+        .math-display {
+            display: block;
+            margin: 1em 0;
+            text-align: center;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        
+        /* Center block formulas */
+        mjx-container[jax="CHTML"][display="true"] {
+            display: block !important;
+            text-align: center !important;
+            margin: 1em auto !important;
+            padding: 0.5em 0 !important;
+            overflow-x: auto !important;
+        }
+        
+        /* Ensure proper alignment for inline math */
+        mjx-container {
+            display: inline-block !important;
+            vertical-align: middle !important;
+        }
+
+        /* Preview styling */
+        #compiled-output {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px 40px;
+            min-height: 545px;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            background-color: var(--card-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            font-size: 15px;
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        #compiled-output h1, 
+        #compiled-output h2, 
+        #compiled-output h3, 
+        #compiled-output h4, 
+        #compiled-output h5, 
+        #compiled-output h6 {
+            margin-top: 1.5em;
+            margin-bottom: 0.75em;
+            color: var(--primary-color);
+        }
+
+        #compiled-output h1 {
+            font-size: 1.8em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.3em;
+        }
+
+        #compiled-output h2 {
+            font-size: 1.5em;
+            margin-top: 1.3em;
+        }
+
+        #compiled-output p {
+            margin: 0.8em 0;
+        }
+
+        /* Improve MathJax specific styles in preview */
+        #compiled-output .math-display {
+            display: block;
+            margin: 1.5em 0;
+            text-align: center;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        /* Center block formulas with more space in preview */
+        #compiled-output mjx-container[jax="CHTML"][display="true"] {
+            display: block !important;
+            text-align: center !important;
+            margin: 1.2em auto !important;
+            padding: 0.7em 0 !important;
+            overflow-x: auto !important;
         }
     </style>
 </head>
@@ -498,13 +603,8 @@
         },
         options: {
             skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-            renderActions: {
-                findBr: [10, function (doc) {
-                    for (const node of document.querySelectorAll('br')) {
-                        node.className += ' MathJax_ignore';
-                    }
-                }, function () {}]
-            }
+            ignoreHtmlClass: 'tex2jax_ignore',
+            processHtmlClass: 'tex2jax_process'
         },
         chtml: {
             scale: 1.1,
@@ -515,7 +615,7 @@
             ready: () => {
                 MathJax.startup.defaultReady();
                 MathJax.startup.promise.then(() => {
-                    MathJax.typesetPromise().catch(err => console.log('Typeset failed: ' + err.message));
+                    console.log('MathJax initial typesetting completed');
                 });
             }
         }
@@ -671,23 +771,30 @@ $$`;
                 let latexText = latexInput.value;
                 let markdownText = latexText;
     
-                // Обработка математических выражений
+                // Обработка математических выражений для Markdown
+                // Сначала обрабатываем блочные выражения
                 markdownText = markdownText.replace(/\\\[([\s\S]*?)\\\]/gs, '$$\n$1\n$$');
-                markdownText = markdownText.replace(/\\\(([\s\S]*?)\\\)/gs, '$$1$');
-                markdownText = markdownText.replace(/\$\$([\s\S]*?)\$\$/gs, '$$\n$1\n$$');
-                markdownText = markdownText.replace(/\$([\s\S]*?)\$/g, '$$1$');
-    
+                // Затем обрабатываем строчные выражения
+                markdownText = markdownText.replace(/\\\(([\s\S]*?)\\\)/gs, '$\$1$');
+                
                 // Устанавливаем результат
                 markdownOutput.value = markdownText;
                 
                 // Отображение предпросмотра
                 compiledOutput.innerHTML = marked.parse(markdownText);
                 
-                // Перерендеринг математических выражений
-                if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
-                    MathJax.typesetPromise([compiledOutput]).catch(err => {
+                // Перерендеринг математических выражений с помощью MathJax
+                if (typeof MathJax !== 'undefined') {
+                    try {
+                        MathJax.typesetClear([compiledOutput]);
+                        MathJax.typesetPromise([compiledOutput]).then(() => {
+                            console.log('MathJax typesetting completed');
+                        }).catch(err => {
+                            console.error('MathJax typesetting error:', err);
+                        });
+                    } catch (err) {
                         console.error('MathJax error:', err);
-                    });
+                    }
                 }
                 
                 statusIndicator.textContent = "Ready";
