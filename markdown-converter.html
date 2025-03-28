@@ -258,28 +258,6 @@
             color: var(--text-color);
         }
 
-        /* Linter styles */
-        .lint-issues {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 6px;
-            background-color: rgba(239, 68, 68, 0.1);
-            border-left: 3px solid var(--error-color);
-        }
-
-        .lint-issue {
-            margin-bottom: 5px;
-            font-size: 13px;
-            color: var(--error-color);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .lint-issue.warning {
-            color: var(--warning-color);
-        }
-
         /* MathJax specific styles */
         .math-display {
             display: block;
@@ -390,16 +368,53 @@
         .toast.warning {
             background-color: var(--warning-color);
         }
+
+        .app-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>LaTeX to Markdown Converter</h1>
         
+        <div class="app-header">
+            <div class="toolbar-group">
+                <div class="toolbar-group">
+                    <label class="switch">
+                        <input type="checkbox" id="auto-convert-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">Auto Convert</span>
+                </div>
+                <div class="toolbar-group">
+                    <label class="switch">
+                        <input type="checkbox" id="auto-copy-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">Auto Copy</span>
+                </div>
+                <div class="toolbar-group">
+                    <button class="btn btn-secondary" onclick="toggleTheme()">
+                        <i class="fas fa-moon"></i> Theme
+                    </button>
+                </div>
+            </div>
+        </div>
+        
         <div class="main-layout">
             <div class="input-output-column">
                 <div class="converter-card">
                     <div class="input-section">
+                        <div class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                            LaTeX Input
+                        </div>
                         <div class="toolbar">
                             <div class="toolbar-group">
                                 <button class="btn" onclick="addLatexExample()">
@@ -409,55 +424,13 @@
                                     <i class="fas fa-trash-alt"></i> Clear
                                 </button>
                             </div>
-                            <div class="toolbar-group">
-                                <button class="btn btn-secondary" onclick="lintLatex()">
-                                    <i class="fas fa-check-circle"></i> Lint
-                                </button>
-                            </div>
-                            <div class="toolbar-group">
-                                <label class="switch">
-                                    <input type="checkbox" id="auto-convert-toggle" checked>
-                                    <span class="slider"></span>
-                                </label>
-                                <span class="toggle-label">Auto Convert</span>
-                            </div>
-                            <div class="toolbar-group">
-                                <label class="switch">
-                                    <input type="checkbox" id="auto-copy-toggle">
-                                    <span class="slider"></span>
-                                </label>
-                                <span class="toggle-label">Auto Copy</span>
-                            </div>
-                            <div class="toolbar-group">
-                                <button class="btn btn-secondary" onclick="toggleTheme()">
-                                    <i class="fas fa-moon"></i> Theme
-                                </button>
-                            </div>
-                        </div>
-                        <div class="section-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                            </svg>
-                            LaTeX Input
                         </div>
                         <textarea id="latex-input" placeholder="Enter your LaTeX here..."></textarea>
-                        <div id="lint-results"></div>
                     </div>
                 </div>
 
                 <div class="converter-card">
                     <div class="output-section">
-                        <div class="toolbar">
-                            <div class="toolbar-group">
-                                <button class="btn btn-success" onclick="copyToClipboard()">
-                                    <i class="fas fa-copy"></i> Copy
-                                </button>
-                                <button class="btn btn-success" onclick="downloadMarkdown()">
-                                    <i class="fas fa-download"></i> Download
-                                </button>
-                            </div>
-                        </div>
                         <div class="section-title">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -469,6 +442,16 @@
                             Markdown Result
                             <div id="status-indicator" class="status-indicator">
                                 <span></span> Ready
+                            </div>
+                        </div>
+                        <div class="toolbar">
+                            <div class="toolbar-group">
+                                <button class="btn btn-success" onclick="copyToClipboard()">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                                <button class="btn btn-success" onclick="downloadMarkdown()">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
                             </div>
                         </div>
                         <textarea id="markdown-output" placeholder="Markdown result will appear here..." readonly></textarea>
@@ -545,7 +528,6 @@
     const statusIndicator = document.getElementById('status-indicator');
     const autoConvertToggle = document.getElementById('auto-convert-toggle');
     const autoCopyToggle = document.getElementById('auto-copy-toggle');
-    const lintResults = document.getElementById('lint-results');
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toast-message');
 
@@ -639,7 +621,6 @@ $$`;
         latexInput.value = '';
         markdownOutput.value = '';
         compiledOutput.textContent = 'Markdown preview will appear here...';
-        lintResults.innerHTML = '';
         showToast('Input cleared');
     }
 
@@ -675,58 +656,6 @@ $$`;
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         showToast('Download started');
-    }
-
-    // Простая функция для проверки LaTeX
-    function lintLatex() {
-        const text = latexInput.value;
-        const issues = [];
-        
-        // Проверка на незакрытые математические выражения
-        const mathBlocks = text.match(/(\$\$|\$\|\\[\(\[])/g);
-        if (mathBlocks) {
-            const openCount = mathBlocks.filter(m => m === '$$' || m === '\\[' || m === '\\(').length;
-            const closeCount = mathBlocks.filter(m => m === '$$' || m === '\\]' || m === '\\)').length;
-            
-            if (openCount !== closeCount) {
-                issues.push({
-                    message: `Unbalanced math delimiters (${openCount} opening vs ${closeCount} closing)`,
-                    severity: 'error'
-                });
-            }
-        }
-        
-        // Проверка на потенциальные ошибки
-        if (text.includes('\\frac{}')) {
-            issues.push({
-                message: 'Empty fraction detected',
-                severity: 'warning'
-            });
-        }
-        
-        if (text.includes('\\begin{') && !text.includes('\\end{')) {
-            issues.push({
-                message: 'Unclosed environment detected',
-                severity: 'error'
-            });
-        }
-        
-        // Отображение результатов
-        if (issues.length === 0) {
-            lintResults.innerHTML = '<div class="lint-issues" style="border-color: var(--success-color)">' +
-                '<div class="lint-issue"><i class="fas fa-check-circle"></i> No issues found</div>' +
-                '</div>';
-        } else {
-            let html = '<div class="lint-issues">';
-            issues.forEach(issue => {
-                const icon = issue.severity === 'error' ? 'fa-exclamation-circle' : 'fa-exclamation-triangle';
-                html += `<div class="lint-issue ${issue.severity}"><i class="fas ${icon}"></i> ${issue.message}</div>`;
-            });
-            html += '</div>';
-            lintResults.innerHTML = html;
-        }
-        
-        showToast(`Found ${issues.length} issues`, issues.length ? 'warning' : 'success');
     }
 
     // Основная функция конвертации
@@ -788,9 +717,6 @@ $$`;
         
         typingTimer = setTimeout(() => {
             convertToMarkdown();
-            if (autoConvertToggle.checked) {
-                lintLatex();
-            }
         }, doneTypingInterval);
     });
 
@@ -801,7 +727,8 @@ $$`;
         
         // Загружаем пример если поле пустое
         if (!latexInput.value.trim()) {
-            addLatexExample();
+            // Removed the automatic example loading
+            // addLatexExample();
         }
     });
     </script>
