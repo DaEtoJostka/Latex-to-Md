@@ -63,6 +63,8 @@
         .main-layout {
             display: flex;
             gap: 20px;
+            align-items: stretch;
+            height: 750px;
         }
 
         .input-output-column {
@@ -70,10 +72,14 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            height: 100%;
         }
 
         .preview-column {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .converter-card {
@@ -83,29 +89,33 @@
             overflow: hidden;
             height: 100%;
             transition: background-color 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
         }
         
-        .input-section, .output-section {
-            min-width: initial;
+        .input-section, .output-section, .preview-section {
             padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
         }
 
-        .section-title {
+        .section-title, .preview-title {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-weight: 500;
             color: var(--primary-color);
         }
         
-        .section-title svg {
+        .section-title svg, .preview-title svg {
             margin-right: 8px;
         }
         
         textarea {
             width: 100%;
-            height: 250px;
-            margin-bottom: 15px;
             padding: 15px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -123,17 +133,26 @@
             box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
         }
         
+        #latex-input {
+            height: auto;
+            margin-bottom: 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
         #markdown-output {
             background-color: var(--bg-color);
             color: var(--text-color);
+            flex: 1;
+            margin-bottom: 0;
+            overflow-y: auto;
         }
         
         #compiled-output {
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 25px 40px;
-            min-height: 545px;
-            max-height: 600px;
+            flex: 1;
             overflow-y: auto;
             white-space: pre-wrap;
             background-color: var(--card-color);
@@ -167,24 +186,6 @@
 
         #compiled-output p {
             margin: 0.8em 0;
-        }
-
-        /* Improve MathJax specific styles */
-        #compiled-output .math-display {
-            display: block;
-            margin: 1.5em 0;
-            text-align: center;
-            overflow-x: auto;
-            padding: 10px 0;
-        }
-
-        /* Center block formulas with more space */
-        #compiled-output mjx-container[jax="CHTML"][display="true"] {
-            display: block !important;
-            text-align: center !important;
-            margin: 1.2em auto !important;
-            padding: 0.7em 0 !important;
-            overflow-x: auto !important;
         }
 
         /* Toolbar styles */
@@ -234,22 +235,6 @@
 
         .btn-success:hover {
             background-color: #059669;
-        }
-
-        .btn-warning {
-            background-color: var(--warning-color);
-        }
-
-        .btn-warning:hover {
-            background-color: #d97706;
-        }
-
-        .btn-error {
-            background-color: var(--error-color);
-        }
-
-        .btn-error:hover {
-            background-color: #dc2626;
         }
 
         .switch {
@@ -303,13 +288,6 @@
             color: var(--text-color);
         }
         
-        /* Scrollable container for wide formulas */
-        .math-scroll {
-            overflow-x: auto;
-            max-width: 100%;
-            padding: 5px 0;
-        }
-        
         .status-indicator {
             display: inline-flex;
             align-items: center;
@@ -347,12 +325,23 @@
         @media (max-width: 992px) {
             .main-layout {
                 flex-direction: column;
+                height: auto;
+                min-height: 800px;
+            }
+            .input-output-column {
+                height: auto;
+                min-height: 500px;
             }
             .preview-column {
-                 margin-top: 20px;
+                margin-top: 20px;
+                height: 400px;
+            }
+            .converter-card {
+                height: 100%;
+                min-height: 0;
             }
             #compiled-output {
-                 min-height: 200px;
+                min-height: 0;
             }
             .toolbar {
                 flex-direction: column;
@@ -419,49 +408,7 @@
             display: inline-block !important;
             vertical-align: middle !important;
         }
-
-        /* Preview styling */
-        #compiled-output {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 25px 40px;
-            min-height: 545px;
-            max-height: 600px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            background-color: var(--card-color);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            font-size: 15px;
-            line-height: 1.6;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
-
-        #compiled-output h1, 
-        #compiled-output h2, 
-        #compiled-output h3, 
-        #compiled-output h4, 
-        #compiled-output h5, 
-        #compiled-output h6 {
-            margin-top: 1.5em;
-            margin-bottom: 0.75em;
-            color: var(--primary-color);
-        }
-
-        #compiled-output h1 {
-            font-size: 1.8em;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.3em;
-        }
-
-        #compiled-output h2 {
-            font-size: 1.5em;
-            margin-top: 1.3em;
-        }
-
-        #compiled-output p {
-            margin: 0.8em 0;
-        }
-
+        
         /* Improve MathJax specific styles in preview */
         #compiled-output .math-display {
             display: block;
@@ -479,11 +426,21 @@
             padding: 0.7em 0 !important;
             overflow-x: auto !important;
         }
+
+        .logo-image {
+            filter: brightness(0) saturate(100%) invert(32%) sepia(74%) saturate(1217%) hue-rotate(218deg) brightness(96%) contrast(93%);
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>LaTeX to Markdown Converter</h1>
+        <h1>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/LaTeX_logo.svg" width="80" height="35" alt="LaTeX Logo" class="logo-image" style="margin-right: 5px;">
+            to
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="45" height="35" alt="Markdown Logo" class="logo-image" style="margin-right: 5px;">
+            Converter
+        </h1>
         
         <div class="app-header">
             <div class="toolbar-group">
@@ -514,11 +471,8 @@
                 <div class="converter-card">
                     <div class="input-section">
                         <div class="section-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                            </svg>
-                            LaTeX Input
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/LaTeX_logo.svg" width="45" height="20" alt="LaTeX Logo" class="logo-image" style="margin-right: 8px;">
+                            Input
                         </div>
                         <div class="toolbar">
                             <div class="toolbar-group">
@@ -537,14 +491,8 @@
                 <div class="converter-card">
                     <div class="output-section">
                         <div class="section-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                                <polyline points="10 9 9 9 8 9"></polyline>
-                            </svg>
-                            Markdown Result
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="28" height="20" alt="Markdown Logo" class="logo-image" style="margin-right: 8px;">
+                            Result
                             <div id="status-indicator" class="status-indicator">
                                 <span></span> Ready
                             </div>
@@ -565,19 +513,26 @@
             </div>
 
             <div class="preview-column">
-                 <div class="section-title" style="padding-left: 5px; margin-bottom: 10px;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="4 17 10 11 4 5"></polyline>
-                        <line x1="12" y1="19" x2="20" y2="19"></line>
-                    </svg>
-                    Preview
+                <div class="converter-card">
+                    <div class="preview-section">
+                        <div class="preview-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="4 17 10 11 4 5"></polyline>
+                                <line x1="12" y1="19" x2="20" y2="19"></line>
+                            </svg>
+                            Preview
+                        </div>
+                        <div id="compiled-output">Markdown preview will appear here...</div>
+                    </div>
                 </div>
-                <div id="compiled-output">Markdown preview will appear here...</div>
             </div>
         </div>
         
         <footer>
-            LaTeX to Markdown Converter &copy; 2023 | Automatic conversion on input
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/LaTeX_logo.svg" width="45" height="20" alt="LaTeX Logo" class="logo-image">
+            to
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="25" height="20" alt="Markdown Logo" class="logo-image" style="margin-right: 3px;">
+            Converter &copy; 2023 | Automatic conversion on input
         </footer>
     </div>
 
@@ -770,35 +725,62 @@ $$`;
             try {
                 let latexText = latexInput.value;
                 let markdownText = latexText;
-    
-                // Обработка математических выражений для Markdown
-                // Сначала обрабатываем блочные выражения
-                markdownText = markdownText.replace(/\\\[([\s\S]*?)\\\]/gs, '$$\n$1\n$$');
-                // Затем обрабатываем строчные выражения
-                markdownText = markdownText.replace(/\\\(([\s\S]*?)\\\)/gs, '$\$1$');
+
+                // 1. First preserve existing $$ delimiters by temporarily replacing them
+                markdownText = markdownText.replace(/\$\$([\s\S]*?)\$\$/g, function(match) {
+                    return "###BLOCKMATH###" + match + "###ENDBLOCKMATH###";
+                });
+
+                // 2. Convert block LaTeX equations properly with spacing
+                markdownText = markdownText.replace(/\\\[([\s\S]*?)\\\]/g, function(match, p1) {
+                    return '\n$$\n' + p1.trim() + '\n$$\n';
+                });
                 
-                // Устанавливаем результат
+                // 3. Convert inline LaTeX equations
+                markdownText = markdownText.replace(/\\\(([\s\S]*?)\\\)/g, function(match, p1) {
+                    return '$' + p1.trim() + '$';
+                });
+                
+                // 4. Restore preserved $$ delimiters
+                markdownText = markdownText.replace(/###BLOCKMATH###\$\$([\s\S]*?)\$\$###ENDBLOCKMATH###/g, function(match, p1) {
+                    return '\n$$\n' + p1.trim() + '\n$$\n';
+                });
+
+                // 5. Update the outputs
                 markdownOutput.value = markdownText;
                 
-                // Отображение предпросмотра
-                compiledOutput.innerHTML = marked.parse(markdownText);
-                
-                // Перерендеринг математических выражений с помощью MathJax
-                if (typeof MathJax !== 'undefined') {
-                    try {
-                        MathJax.typesetClear([compiledOutput]);
-                        MathJax.typesetPromise([compiledOutput]).then(() => {
-                            console.log('MathJax typesetting completed');
-                        }).catch(err => {
-                            console.error('MathJax typesetting error:', err);
-                        });
-                    } catch (err) {
-                        console.error('MathJax error:', err);
+                // 6. Use timeout to ensure DOM is ready before rendering
+                setTimeout(() => {
+                    compiledOutput.innerHTML = marked.parse(markdownText);
+                    
+                    // 7. Properly handle MathJax rendering with robust error checking
+                    if (typeof MathJax !== 'undefined') {
+                        try {
+                            MathJax.typesetClear([compiledOutput]);
+                            MathJax.typesetPromise([compiledOutput])
+                                .then(() => {
+                                    console.log('MathJax rendering complete');
+                                    
+                                    // 8. Force display mode for block equations
+                                    const blockMathElements = compiledOutput.querySelectorAll('.math-display, mjx-container[display="true"]');
+                                    blockMathElements.forEach(elem => {
+                                        elem.style.display = 'block';
+                                        elem.style.margin = '1.5em 0';
+                                        elem.style.overflow = 'auto';
+                                    });
+                                })
+                                .catch(err => {
+                                    console.error('MathJax rendering error:', err);
+                                    showToast('Formula rendering error', 'warning');
+                                });
+                        } catch (mjError) {
+                            console.error('MathJax processing error:', mjError);
+                        }
                     }
-                }
-                
-                statusIndicator.textContent = "Ready";
-                statusIndicator.classList.add("active");
+                    
+                    statusIndicator.textContent = "Ready";
+                    statusIndicator.classList.add("active");
+                }, 50);
                 
                 // Автоматическое копирование если включено
                 if (autoCopyToggle.checked && markdownText.trim()) {
@@ -831,12 +813,6 @@ $$`;
     document.addEventListener('DOMContentLoaded', () => {
         markdownOutput.value = "";
         compiledOutput.textContent = "Markdown preview will appear here...";
-        
-        // Загружаем пример если поле пустое
-        if (!latexInput.value.trim()) {
-            // Removed the automatic example loading
-            // addLatexExample();
-        }
     });
     </script>
 </body>
