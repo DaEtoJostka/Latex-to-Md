@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>LaTeX to Markdown Converter</title>
+    <title>Markdown</title>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -11,7 +12,7 @@
             --primary-hover: #3a56d4;
             --bg-color: #f8fafc;
             --card-color: #ffffff;
-            --text-color: #1e293b;
+            --text-color: #64748b;
             --border-color: #e2e8f0;
             --success-color: #10b981;
             --warning-color: #f59e0b;
@@ -306,7 +307,7 @@
             color: var(--success-color);
         }
         
-        .status-indicator span {
+        .status-indicator span:first-child {
             display: inline-block;
             width: 8px;
             height: 8px;
@@ -431,6 +432,90 @@
             filter: brightness(0) saturate(100%) invert(32%) sepia(74%) saturate(1217%) hue-rotate(218deg) brightness(96%) contrast(93%);
             vertical-align: middle;
         }
+
+        .author-link {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: inline-block;
+            margin-left: 4px;
+        }
+        
+        .author-link:hover {
+            transform: scale(1.05);
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        .lang-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            background-color: var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .lang-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .lang-btn:hover {
+            background-color: var(--primary-hover);
+            color: white;
+        }
+
+        .help-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            margin-left: 6px;
+            font-size: 14px;
+            cursor: help;
+            position: relative;
+        }
+
+        .help-icon:hover::after {
+            content: attr(data-tooltip-en);
+            position: absolute;
+            background: var(--card-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            width: 220px;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            pointer-events: none;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Update tooltip content based on language */
+        html[lang="ru"] .help-icon:hover::after {
+            content: attr(data-tooltip-ru);
+        }
+
+        .compact-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .compact-toolbar .toggle-label {
+            margin-right: 12px;
+        }
     </style>
 </head>
 <body>
@@ -439,30 +524,25 @@
             <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/LaTeX_logo.svg" width="80" height="35" alt="LaTeX Logo" class="logo-image" style="margin-right: 5px;">
             to
             <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="45" height="35" alt="Markdown Logo" class="logo-image" style="margin-right: 5px;">
-            Converter
+            Markdown
         </h1>
         
         <div class="app-header">
-            <div class="toolbar-group">
-                <div class="toolbar-group">
-                    <label class="switch">
-                        <input type="checkbox" id="auto-convert-toggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                    <span class="toggle-label">Auto Convert</span>
-                </div>
-                <div class="toolbar-group">
-                    <label class="switch">
-                        <input type="checkbox" id="auto-copy-toggle">
-                        <span class="slider"></span>
-                    </label>
-                    <span class="toggle-label">Auto Copy</span>
-                </div>
-                <div class="toolbar-group">
-                    <button class="btn btn-secondary" onclick="toggleTheme()">
-                        <i class="fas fa-moon"></i> Theme
-                    </button>
-                </div>
+            <div class="toolbar-group compact-toolbar">
+                <label class="switch">
+                    <input type="checkbox" id="auto-copy-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="help-icon" data-tooltip-en="Automatically copies the result to clipboard after conversion" data-tooltip-ru="Автоматически копирует результат в буфер обмена после конвертации">
+                    <i class="fas fa-question-circle"></i>
+                </span>
+                <span class="toggle-label" data-en="Auto Copy" data-ru="Авто копирование">Auto Copy</span>
+                <button class="btn" id="lang-toggle">
+                    <i class="fas fa-language"></i> <span id="lang-text">EN</span>
+                </button>
+                <button class="btn btn-secondary" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> <span data-en="Theme" data-ru="Тема">Theme</span>
+                </button>
             </div>
         </div>
         
@@ -472,19 +552,19 @@
                     <div class="input-section">
                         <div class="section-title">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/LaTeX_logo.svg" width="45" height="20" alt="LaTeX Logo" class="logo-image" style="margin-right: 8px;">
-                            Input
+                            <span data-en="Input" data-ru="Ввод">Input</span>
                         </div>
                         <div class="toolbar">
                             <div class="toolbar-group">
                                 <button class="btn" onclick="addLatexExample()">
-                                    <i class="fas fa-lightbulb"></i> Load Example
+                                    <i class="fas fa-lightbulb"></i> <span data-en="Load Example" data-ru="Загрузить пример">Load Example</span>
                                 </button>
                                 <button class="btn btn-secondary" onclick="clearInput()">
-                                    <i class="fas fa-trash-alt"></i> Clear
+                                    <i class="fas fa-trash-alt"></i> <span data-en="Clear" data-ru="Очистить">Clear</span>
                                 </button>
                             </div>
                         </div>
-                        <textarea id="latex-input" placeholder="Enter your LaTeX here..."></textarea>
+                        <textarea id="latex-input" placeholder="Enter your LaTeX here..." data-en="Enter your LaTeX here..." data-ru="Введите LaTeX здесь..."></textarea>
                     </div>
                 </div>
 
@@ -492,22 +572,22 @@
                     <div class="output-section">
                         <div class="section-title">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="28" height="20" alt="Markdown Logo" class="logo-image" style="margin-right: 8px;">
-                            Result
+                            <span data-en="Result" data-ru="Результат">Result</span>
                             <div id="status-indicator" class="status-indicator">
-                                <span></span> Ready
+                                <span></span> <span data-en="Ready" data-ru="Готово">Ready</span>
                             </div>
                         </div>
                         <div class="toolbar">
                             <div class="toolbar-group">
                                 <button class="btn btn-success" onclick="copyToClipboard()">
-                                    <i class="fas fa-copy"></i> Copy
+                                    <i class="fas fa-copy"></i> <span data-en="Copy" data-ru="Копировать">Copy</span>
                                 </button>
                                 <button class="btn btn-success" onclick="downloadMarkdown()">
-                                    <i class="fas fa-download"></i> Download
+                                    <i class="fas fa-download"></i> <span data-en="Download" data-ru="Скачать">Download</span>
                                 </button>
                             </div>
                         </div>
-                        <textarea id="markdown-output" placeholder="Markdown result will appear here..." readonly></textarea>
+                        <textarea id="markdown-output" placeholder="Markdown result will appear here..." data-en="Markdown result will appear here..." data-ru="Результат в Markdown появится здесь..." readonly></textarea>
                     </div>
                 </div>
             </div>
@@ -520,9 +600,9 @@
                                 <polyline points="4 17 10 11 4 5"></polyline>
                                 <line x1="12" y1="19" x2="20" y2="19"></line>
                             </svg>
-                            Preview
+                            <span data-en="Preview" data-ru="Превью">Preview</span>
                         </div>
-                        <div id="compiled-output">Markdown preview will appear here...</div>
+                        <div id="compiled-output" data-en="Markdown preview will appear here..." data-ru="Превью Markdown появится здесь...">Markdown preview will appear here...</div>
                     </div>
                 </div>
             </div>
@@ -532,7 +612,7 @@
             <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/LaTeX_logo.svg" width="45" height="20" alt="LaTeX Logo" class="logo-image">
             to
             <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="25" height="20" alt="Markdown Logo" class="logo-image" style="margin-right: 3px;">
-            Converter &copy; 2023 | Automatic conversion on input
+            <a href="https://github.com/DaEtoJostka" target="_blank" class="author-link">by 👾 Karlov Ivan</a>
         </footer>
     </div>
 
@@ -581,14 +661,16 @@
     const markdownOutput = document.getElementById('markdown-output');
     const compiledOutput = document.getElementById('compiled-output');
     const statusIndicator = document.getElementById('status-indicator');
-    const autoConvertToggle = document.getElementById('auto-convert-toggle');
     const autoCopyToggle = document.getElementById('auto-copy-toggle');
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toast-message');
+    const langToggleBtn = document.getElementById('lang-toggle');
+    const langText = document.getElementById('lang-text');
 
     // Состояние приложения
     let isConverting = false;
     let isDarkMode = false;
+    let currentLang = 'en';
 
     // Функция для показа уведомления
     function showToast(message, type = 'success') {
@@ -608,19 +690,61 @@
         document.body.classList.toggle('dark-mode');
         localStorage.setItem('darkMode', isDarkMode);
         
-        // Обновляем иконку
-        const themeBtn = document.querySelector('.btn-secondary i.fa-moon');
+        const themeBtn = document.querySelector('.btn-secondary i');
         if (themeBtn) {
             themeBtn.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
         }
         
-        showToast(`Switched to ${isDarkMode ? 'dark' : 'light'} mode`);
+        showToast(currentLang === 'en' 
+            ? `Switched to ${isDarkMode ? 'dark' : 'light'} mode`
+            : `Переключено в ${isDarkMode ? 'тёмный' : 'светлый'} режим`);
     }
 
     // Проверяем сохраненную тему
     if (localStorage.getItem('darkMode') === 'true') {
-        toggleTheme(); // Применяем темную тему если она была сохранена
+        toggleTheme();
     }
+
+    // Функция для переключения языка
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('language', lang);
+        
+        // Set the HTML lang attribute for tooltip language support
+        document.documentElement.setAttribute('lang', lang);
+        
+        // Update all elements with language attributes
+        document.querySelectorAll('[data-en], [data-ru]').forEach(element => {
+            if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
+                const placeholder = element.getAttribute(`data-${lang}`);
+                if (placeholder) {
+                    element.setAttribute('placeholder', placeholder);
+                }
+            } else {
+                const text = element.getAttribute(`data-${lang}`);
+                if (text) {
+                    element.textContent = text;
+                }
+            }
+        });
+        
+        // Update status indicator
+        const statusText = document.querySelector('#status-indicator span:last-child');
+        if (statusText) {
+            statusText.textContent = lang === 'en' ? 'Ready' : 'Готово';
+        }
+    }
+
+    // Проверяем сохраненный язык
+    const savedLang = localStorage.getItem('language') || 'en';
+    setLanguage(savedLang);
+
+    // Toggle language on click
+    langToggleBtn.addEventListener('click', () => {
+        const newLang = currentLang === 'en' ? 'ru' : 'en';
+        setLanguage(newLang);
+        langText.textContent = newLang.toUpperCase();
+    });
 
     // Функция для добавления примера LaTeX
     function addLatexExample() {
@@ -665,39 +789,38 @@ $$
 f(x) + \\frac{f'(x)}{2}\\Delta x + \\frac{f''(x)}{6}(\\Delta x)^2 + \\frac{f'''(x)}{24}(\\Delta x)^3 + \\cdots
 $$`;
 
-        if (autoConvertToggle.checked) {
-            convertToMarkdown();
-        }
-        showToast('Example loaded');
+        showToast(currentLang === 'en' ? 'Example loaded' : 'Пример загружен');
     }
 
     // Функция для очистки ввода
     function clearInput() {
         latexInput.value = '';
         markdownOutput.value = '';
-        compiledOutput.textContent = 'Markdown preview will appear here...';
-        showToast('Input cleared');
+        compiledOutput.textContent = currentLang === 'en' 
+            ? 'Markdown preview will appear here...' 
+            : 'Превью Markdown появится здесь...';
+        showToast(currentLang === 'en' ? 'Input cleared' : 'Ввод очищен');
     }
 
     // Функция для копирования в буфер обмена
     function copyToClipboard() {
         if (!markdownOutput.value) {
-            showToast('Nothing to copy', 'error');
+            showToast(currentLang === 'en' ? 'Nothing to copy' : 'Нечего копировать', 'error');
             return;
         }
         
         navigator.clipboard.writeText(markdownOutput.value)
-            .then(() => showToast('Copied to clipboard!'))
+            .then(() => showToast(currentLang === 'en' ? 'Copied to clipboard!' : 'Скопировано в буфер!'))
             .catch(err => {
                 console.error('Failed to copy: ', err);
-                showToast('Failed to copy', 'error');
+                showToast(currentLang === 'en' ? 'Failed to copy' : 'Ошибка копирования', 'error');
             });
     }
 
     // Функция для скачивания Markdown файла
     function downloadMarkdown() {
         if (!markdownOutput.value) {
-            showToast('Nothing to download', 'error');
+            showToast(currentLang === 'en' ? 'Nothing to download' : 'Нечего скачивать', 'error');
             return;
         }
         
@@ -710,15 +833,16 @@ $$`;
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast('Download started');
+        showToast(currentLang === 'en' ? 'Download started' : 'Скачивание начато');
     }
 
-    // Основная функция конвертации
+    // Функция для конвертации
     function convertToMarkdown() {
-        if (isConverting || !autoConvertToggle.checked) return;
+        if (isConverting) return;
         
         isConverting = true;
-        statusIndicator.textContent = "Converting...";
+        const statusText = document.querySelector('#status-indicator span:last-child');
+        statusText.textContent = currentLang === 'en' ? 'Converting...' : 'Конвертация...';
         statusIndicator.classList.remove("active");
         
         setTimeout(() => {
@@ -771,23 +895,26 @@ $$`;
                                 })
                                 .catch(err => {
                                     console.error('MathJax rendering error:', err);
-                                    showToast('Formula rendering error', 'warning');
+                                    showToast(currentLang === 'en' 
+                                        ? 'Formula rendering error' 
+                                        : 'Ошибка отображения формул', 'warning');
                                 });
                         } catch (mjError) {
                             console.error('MathJax processing error:', mjError);
                         }
                     }
                     
-                    statusIndicator.textContent = "Ready";
+                    statusText.textContent = currentLang === 'en' ? 'Ready' : 'Готово';
                     statusIndicator.classList.add("active");
+                    
+                    // Auto copy after conversion is complete if enabled
+                    if (autoCopyToggle.checked && markdownText.trim()) {
+                        copyToClipboard();
+                    }
                 }, 50);
-                
-                // Автоматическое копирование если включено
-                if (autoCopyToggle.checked && markdownText.trim()) {
-                    copyToClipboard();
-                }
             } catch (error) {
-                statusIndicator.textContent = "Error";
+                const statusText = document.querySelector('#status-indicator span:last-child');
+                statusText.textContent = currentLang === 'en' ? 'Error' : 'Ошибка';
                 console.error("Conversion error:", error);
             } finally {
                 isConverting = false;
@@ -801,7 +928,8 @@ $$`;
     
     latexInput.addEventListener('input', () => {
         clearTimeout(typingTimer);
-        statusIndicator.textContent = "Typing...";
+        const statusText = document.querySelector('#status-indicator span:last-child');
+        statusText.textContent = currentLang === 'en' ? 'Typing...' : 'Печатает...';
         statusIndicator.classList.remove("active");
         
         typingTimer = setTimeout(() => {
@@ -812,7 +940,9 @@ $$`;
     // Инициализация при загрузке
     document.addEventListener('DOMContentLoaded', () => {
         markdownOutput.value = "";
-        compiledOutput.textContent = "Markdown preview will appear here...";
+        compiledOutput.textContent = currentLang === 'en' 
+            ? "Markdown preview will appear here..." 
+            : "Превью Markdown появится здесь...";
     });
     </script>
 </body>
