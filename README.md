@@ -9,14 +9,17 @@
     Simple web app that helps you copy LaTeX formulas from LLMs and paste them into Markdown documents.
   </p>
 </div>
+
+
+<div align="center">
+  <img src="demo.gif" alt="Demo" style="max-width: 100%; height: auto;">
+</div>
+
 <div align="center">
   <a href="https://daetojostka.github.io/Latex-to-Md/">
     https://daetojostka.github.io/Latex-to-Md/
   </a>
 </div>
-
-
-![Demo](demo.gif)
 
 ## Features
 
