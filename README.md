@@ -1,8 +1,8 @@
 <div align="center">
   <h1>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/LaTeX_logo.svg" width="80" height="35" alt="LaTeX Logo" class="logo-image" style="margin-right: 5px;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/LaTeX_logo.svg" width="80" height="35" alt="LaTeX Logo" class="logo-image" style="margin-right: 5px; filter: brightness(0) invert(1);">
     to
-    <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="45" height="35" alt="Markdown Logo" class="logo-image" style="margin-right: 5px;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="45" height="35" alt="Markdown Logo" class="logo-image" style="margin-right: 5px; filter: brightness(0) invert(1);">
     Markdown
   </h1>
   <p>
