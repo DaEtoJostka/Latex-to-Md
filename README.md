@@ -1,0 +1,22 @@
+<div align="center">
+  <h1>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/LaTeX_logo.svg" width="80" height="35" alt="LaTeX Logo" class="logo-image" style="margin-right: 5px;">
+    to
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="45" height="35" alt="Markdown Logo" class="logo-image" style="margin-right: 5px;">
+    Markdown
+  </h1>
+</div>
+
+Simple web app that helps you copy LaTeX formulas from LLMs and paste them into Markdown documents.
+
+![Demo](demo.gif)
+
+## Features
+
+- Converts LaTeX math formulas to Markdown-compatible syntax
+- Real-time preview with MathJax rendering
+- Auto copy to clipboard functionality
+
+## License
+
+This project is licensed under the MIT License.
