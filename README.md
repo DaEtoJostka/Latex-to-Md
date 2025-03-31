@@ -24,4 +24,4 @@ Simple web app that helps you copy LaTeX formulas from LLMs and paste them into 
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the [[MIT|LICENSE]] License.
