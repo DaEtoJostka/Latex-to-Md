@@ -5,6 +5,9 @@
     <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="45" height="35" alt="Markdown Logo" class="logo-image" style="margin-right: 5px;">
     Markdown
   </h1>
+  <p>
+    Simple web app that helps you copy LaTeX formulas from LLMs and paste them into Markdown documents.
+  </p>
 </div>
 <div align="center">
   <a href="https://daetojostka.github.io/Latex-to-Md/">
@@ -12,8 +15,6 @@
   </a>
 </div>
 
-
-Simple web app that helps you copy LaTeX formulas from LLMs and paste them into Markdown documents.
 
 ![Demo](demo.gif)
 
